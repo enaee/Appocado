@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "403825518536",
+    "firebase_url": "https://appocado-mob-computing.firebaseio.com",
+    "project_id": "appocado-mob-computing",
+    "storage_bucket": "appocado-mob-computing.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:403825518536:android:2469466664f4c4eb61c2fd",
+        "android_client_info": {
+          "package_name": "com.jku.appocado"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "403825518536-sbja1bbujs5aj1vgui1ugvd9tjfudh9p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB4YqxZ2tcsRTjJhzaveSZGzFRb8LlYu1g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "403825518536-sbja1bbujs5aj1vgui1ugvd9tjfudh9p.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
