@@ -28,8 +28,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
-import org.w3c.dom.Text;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
@@ -66,19 +64,19 @@ public class HabitOverview extends AppCompatActivity
         }
         mLocationText = (TextView) findViewById(R.id.textView);
         mHabitText = (TextView) findViewById(R.id.Habit);
-        mButton = (Button) findViewById(R.id.button2);
-
-        mButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mLocation != null){
-                    Toast.makeText(getApplicationContext(),"Location accuracy: " + mLocation.getAccuracy(),Toast.LENGTH_SHORT).show();
-                }
-                else {
-                    Toast.makeText(getApplicationContext(),"No location available ",Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
+//        mButton = (Button) findViewById(R.id.button2);
+//
+//        mButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (mLocation != null){
+//                    Toast.makeText(getApplicationContext(),"Location accuracy: " + mLocation.getAccuracy(),Toast.LENGTH_SHORT).show();
+//                }
+//                else {
+//                    Toast.makeText(getApplicationContext(),"No location available ",Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//        });
     }
 
     private void checkPermissions() {

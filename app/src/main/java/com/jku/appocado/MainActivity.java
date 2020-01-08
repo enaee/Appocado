@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -57,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
     private ChildEventListener mUsersEventListener;
 
     //UI
-    private TextView mTextView;
+//    private TextView mTextView;
     private GridView mGridView;
 
 
@@ -81,7 +83,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initializeUI() {
-        mTextView = findViewById(R.id.tvTest);
+//        mTextView = findViewById(R.id.tvTest);
+
+        //Grid view for selected habits
         mGridView = (GridView) findViewById(R.id.grid_view);
         mAdapter = new CustomGridAdapter(this, R.layout.grid_view_item, usersHabitList);
         mGridView.setAdapter(mAdapter);
@@ -89,11 +93,21 @@ public class MainActivity extends AppCompatActivity {
         mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //TODO: create a new intent that will open HabitOverview activity
+                // Creates new intent, passes name of habit to habit overview screen
                 Intent intent = new Intent(MainActivity.this, HabitOverview.class);
                 intent.putExtra("Habit", mAdapter.getItem(position).getHabitName());
                 Toast.makeText(getApplicationContext(), mAdapter.getItem(position).getHabitName(), Toast.LENGTH_SHORT).show();
                 startActivity(intent);
+            }
+        });
+
+        // Floating Action button to go to select new habits
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "New Habits coming soon!", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
             }
         });
     }
