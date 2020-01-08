@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -12,8 +12,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="test" />
-    <GridLayout
-        android:id="@+id/gridLayout"
+
+    <GridView
+        android:id="@+id/grid_view"
+        android:layout_below="@+id/tvTest"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:columnCount="2"
@@ -35,6 +37,17 @@
             app:layout_constraintVertical_bias="0.498" />
 
 
-    </GridLayout>
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:padding="16dp"
+        android:visibility="visible" />
 
-</LinearLayout>
+</RelativeLayout>
