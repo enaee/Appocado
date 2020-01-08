@@ -1,13 +1,16 @@
 package com.jku.appocado;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,31 +24,41 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.jku.appocado.Adapters.CustomGridAdapter;
+import com.jku.appocado.Models.GridItem;
+import com.jku.appocado.Models.Habit;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static final String ANONYMOUS = "anonymous";
     private static final String TAG = "MainActivity";
     private static final int RC_SIGN_IN = 123; //RC = request code
-    private static final int RC_PHOTO_PICKER =  12;
-
-    public static final String ANONYMOUS = "anonymous";
-
+    private static final int RC_PHOTO_PICKER = 12;
     private String mUserID;
+    private ArrayList usersHabitList = new ArrayList<>();
+    private ArrayList allHabitsList = new ArrayList();
+    private CustomGridAdapter mAdapter;
 
     // Firebase instance variables
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mDatabaseReference;
+    private DatabaseReference mHabitsReference;
+    private DatabaseReference mUsersReference;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
     private FirebaseStorage mFirebaseStorage;
     private StorageReference mChatPhotosStorageReference;
     private ChildEventListener mChildEventListener;
+    private ChildEventListener mHabitsEventListener;
+    private ChildEventListener mUsersEventListener;
 
     //UI
     private TextView mTextView;
+    private GridView mGridView;
 
 
     @Override
@@ -58,11 +71,29 @@ public class MainActivity extends AppCompatActivity {
         //Initializse Firebase components
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mFirebaseStorage = FirebaseStorage.getInstance();
-        mDatabaseReference = mFirebaseDatabase.getReference().child("habits");
+        mDatabaseReference = mFirebaseDatabase.getReference();
+        mHabitsReference = mDatabaseReference.child("habits");
+        mUsersReference = mDatabaseReference.child("users").child(mUserID);
+
 
         initializeFirebaseAuth();
         initializeUI();
 
+    }
+
+    private void initializeUI() {
+        mTextView = findViewById(R.id.tvTest);
+        mGridView = (GridView) findViewById(R.id.grid_view);
+        mAdapter = new CustomGridAdapter(this, R.layout.grid_view_item, usersHabitList);
+        mGridView.setAdapter(mAdapter);
+
+        mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //TODO: create a new intent that will open HabitOverview activity
+                Toast.makeText(getApplicationContext(), mAdapter.getItem(position).getHabitName(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void initializeFirebaseAuth() {
@@ -105,22 +136,29 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-    private void initializeUI() {
-        mTextView = findViewById(R.id.tvTest);
-        mTextView.setText("Hello");
-    }
+
 
     private void onSignedInInitialize() {
         mUserID = mFirebaseUser.getUid();
-        mDatabaseReference.child("users").child(mUserID).child("name").setValue(mFirebaseUser.getDisplayName());;
+        mFirebaseDatabase.getReference().child("users").child(mUserID).child("name").setValue(mFirebaseUser.getDisplayName());
+        ;
         attachDatabaseReadListener();
     }
 
-    private void attachDatabaseReadListener () {
-        if (mChildEventListener==null) {
+    private void attachDatabaseReadListener() {
+        if (mChildEventListener == null) {
             mChildEventListener = new ChildEventListener() {
                 @Override
                 public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                    if (dataSnapshot.getKey().equals("habits")) {
+                        for (DataSnapshot child : dataSnapshot.getChildren()) {
+                            Habit habit = new Habit();
+                            habit = child.getValue(Habit.class);
+                            habit.setId(dataSnapshot.getKey());
+                            allHabitsList.add(habit);
+                            mAdapter.add(new GridItem(habit.getName(),0));
+                        }
+                    }
 
                 }
 
@@ -144,23 +182,30 @@ public class MainActivity extends AppCompatActivity {
 
                 }
             };
-            mDatabaseReference.child("users").child(mUserID).addChildEventListener(mChildEventListener);
+            mDatabaseReference.addChildEventListener(mChildEventListener);
         }
     }
-
 
     private void onSignedOutCleanup() {
         mUserID = ANONYMOUS;
         //mMessageAdapter.clear();
         detachDatabaseReadListener();
     }
-    private void detachDatabaseReadListener () {
+
+    private void detachDatabaseReadListener() {
+        if (mHabitsEventListener != null) {
+            mHabitsReference.removeEventListener(mHabitsEventListener);
+            mHabitsEventListener = null;
+        }
+        if (mUsersEventListener != null) {
+            mUsersReference.removeEventListener(mHabitsEventListener);
+            mUsersEventListener = null;
+        }
         if (mChildEventListener != null) {
             mDatabaseReference.removeEventListener(mChildEventListener);
-            mChildEventListener =null;
+            mChildEventListener = null;
         }
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -168,13 +213,15 @@ public class MainActivity extends AppCompatActivity {
         inflater.inflate(R.menu.main_menu, menu);
         return true;
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.sign_out_menu:
                 AuthUI.getInstance().signOut(this);
                 return true;
-            default: return super.onOptionsItemSelected(item);
+            default:
+                return super.onOptionsItemSelected(item);
 
         }
     }
@@ -183,11 +230,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        if (mAuthStateListener!=null) {
+        if (mAuthStateListener != null) {
             mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
         }
         detachDatabaseReadListener();
-
+        mAdapter.clear();
     }
 
     @Override
