@@ -90,7 +90,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 //TODO: create a new intent that will open HabitOverview activity
+                Intent intent = new Intent(MainActivity.this, HabitOverview.class);
                 Toast.makeText(getApplicationContext(), mAdapter.getItem(position).getHabitName(), Toast.LENGTH_SHORT).show();
+                startActivity(intent);
             }
         });
     }
