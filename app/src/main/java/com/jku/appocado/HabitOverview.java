@@ -28,6 +28,8 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import org.w3c.dom.Text;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
@@ -43,6 +45,7 @@ public class HabitOverview extends AppCompatActivity
     private Location mLocation;
     private TextView mLocationText;
     private Button mButton;
+    private TextView mHabitText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +65,7 @@ public class HabitOverview extends AppCompatActivity
                     addApi(LocationServices.API).build();
         }
         mLocationText = (TextView) findViewById(R.id.textView);
+        mHabitText = (TextView) findViewById(R.id.Habit);
         mButton = (Button) findViewById(R.id.button2);
 
         mButton.setOnClickListener(new View.OnClickListener() {
@@ -162,6 +166,8 @@ public class HabitOverview extends AppCompatActivity
             }
             String cityName = addresses.get(0).getLocality();
             mLocationText.setText(cityName);
+            String sessionId = getIntent().getStringExtra("Habit");
+            mHabitText.setText(sessionId);
         }
     }
 
