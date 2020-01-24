@@ -24,6 +24,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.jku.appocado.Adapters.CustomGridAdapter;
@@ -82,6 +83,24 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    protected void onStart(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        mUserID = ANONYMOUS;
+
+        //Initializse Firebase components
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        mFirebaseStorage = FirebaseStorage.getInstance();
+        mDatabaseReference = mFirebaseDatabase.getReference();
+        mHabitsReference = mDatabaseReference.child("habits");
+        mUsersReference = mDatabaseReference.child("users").child(mUserID);
+
+
+        initializeFirebaseAuth();
+        initializeUI();
+
+    }
+
     private void initializeUI() {
 //        mTextView = findViewById(R.id.tvTest);
 
@@ -97,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, HabitOverview.class);
                 intent.putExtra("Habit", mAdapter.getItem(position).getHabitName());
                 Toast.makeText(getApplicationContext(), mAdapter.getItem(position).getHabitName(), Toast.LENGTH_SHORT).show();
-                startActivity(intent);
+                startActivityForResult(intent, 12);
             }
         });
 
@@ -106,8 +125,9 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "New Habits coming soon!", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                // Creates new intent, passes name of habit to habit overview screen
+                Intent intent = new Intent(MainActivity.this, HabitSelection.class);
+                startActivity(intent);
             }
         });
     }
@@ -166,18 +186,22 @@ public class MainActivity extends AppCompatActivity {
             mChildEventListener = new ChildEventListener() {
                 @Override
                 public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                    if (dataSnapshot.getKey().equals("habits")) {
-                        for (DataSnapshot child : dataSnapshot.getChildren()) {
-                            Habit habit = new Habit();
-                            habit = child.getValue(Habit.class);
-                            habit.setId(dataSnapshot.getKey());
-                            allHabitsList.add(habit);
-                            mAdapter.add(new GridItem(habit.getName(),0));
+                    for (DataSnapshot child : dataSnapshot.getChildren()) {
+                        if (mUserID == child.getKey()) {
+                            for (DataSnapshot user_information : child.getChildren()) {
+                                if( "habits".equals(user_information.getKey())) {
+                                    for (DataSnapshot habits: user_information.getChildren()){
+                                        Habit habit;
+                                        habit = habits.getValue(Habit.class);
+                                        habit.setId(dataSnapshot.getKey());
+                                        allHabitsList.add(habit);
+                                        mAdapter.add(new GridItem(habit.getName(), 0, habit.getDescription()));
+                                    }
+                                }
+                            }
                         }
                     }
-
                 }
-
                 @Override
                 public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
 
@@ -257,5 +281,30 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+
+        FirebaseDatabase.getInstance().getReference().child("users")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot habit_values : dataSnapshot.getChildren()) {
+                            if (dataSnapshot.getKey().equals(mUserID)) {
+                                for (DataSnapshot habits : habit_values.getChildren()) {
+                                    Habit habit = new Habit(habits.getValue().toString(), habits.getKey());
+                                    habit.setId(dataSnapshot.getKey());
+                                    allHabitsList.add(habit);
+                                    mAdapter.add(new GridItem(habit.getName(), 0, habit.getDescription()));
+                                }
+                            }
+                        }
+                    }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                });
     }
 }

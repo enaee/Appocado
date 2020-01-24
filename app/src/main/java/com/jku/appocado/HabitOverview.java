@@ -3,7 +3,6 @@ package com.jku.appocado;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -16,10 +15,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.location.LocationListener;
@@ -42,7 +38,6 @@ public class HabitOverview extends AppCompatActivity
     private GoogleApiClient mGoogleApiClient;
     private Location mLocation;
     private TextView mLocationText;
-    private Button mButton;
     private TextView mHabitText;
 
     @Override
@@ -64,19 +59,6 @@ public class HabitOverview extends AppCompatActivity
         }
         mLocationText = (TextView) findViewById(R.id.textView);
         mHabitText = (TextView) findViewById(R.id.Habit);
-//        mButton = (Button) findViewById(R.id.button2);
-//
-//        mButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (mLocation != null){
-//                    Toast.makeText(getApplicationContext(),"Location accuracy: " + mLocation.getAccuracy(),Toast.LENGTH_SHORT).show();
-//                }
-//                else {
-//                    Toast.makeText(getApplicationContext(),"No location available ",Toast.LENGTH_SHORT).show();
-//                }
-//            }
-//        });
     }
 
     private void checkPermissions() {
