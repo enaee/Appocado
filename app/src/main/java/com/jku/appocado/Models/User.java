@@ -5,6 +5,10 @@ import java.util.ArrayList;
 public class User {
     String userID;
     String name;
+    ArrayList habits;
+
+    public User() {
+    }
 
     public User(String userID, String name) {
         this.userID = userID;
@@ -25,5 +29,9 @@ public class User {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public ArrayList getUserHabits() {
+        return habits;
     }
 }
