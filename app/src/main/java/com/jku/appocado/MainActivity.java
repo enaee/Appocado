@@ -33,11 +33,16 @@ import java.util.Arrays;
 public class MainActivity extends AppCompatActivity {
 
     public static final String ANONYMOUS = "anonymous";
+    public static final String HABIT_NAME = "habit name";
+    public static final String USER_ID = "userID";
+    public static final String HABIT_DESCRIPTION = "habit description";
+    public static final String HABIT_ID = "habitID";
+
     private static final String TAG = "MainActivity";
     private static final String USER_HABITS = "User Habit List";
-    private static final int RC_SIGN_IN = 123; //RC = request code
-    private String mUserID;
+    private static final int RC_SIGN_IN = 123;
     public static ArrayList usersHabitList = new ArrayList<>();
+    private String mUserID;
     private ArrayList userHabitIDList = new ArrayList<>();
     private CustomGridAdapter mAdapter;
 
@@ -110,11 +115,14 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // Creates new intent, passes name of habit to habit overview screen
                 Intent intent = new Intent(MainActivity.this, HabitOverview.class);
-                intent.putExtra("Habit", mAdapter.getItem(position).getName());
+                intent.putExtra(HABIT_NAME, mAdapter.getItem(position).getName());
+                intent.putExtra(USER_ID, mUserID);
+                intent.putExtra(HABIT_ID, mAdapter.getItem(position).getId());
                 Toast.makeText(getApplicationContext(), mAdapter.getItem(position).getName(), Toast.LENGTH_SHORT).show();
                 startActivityForResult(intent, 12);
             }
         });
+
 
         // Floating Action button to go to select new habits
         FloatingActionButton fab = findViewById(R.id.fab);
@@ -183,10 +191,10 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                     for (DataSnapshot child : dataSnapshot.getChildren()) {
-                        if (mUserID == child.getKey()) {
+                        if (mUserID.equals(child.getKey())) {
                             for (DataSnapshot user_information : child.getChildren()) {
-                                if( "habits".equals(user_information.getKey())) {
-                                    for (DataSnapshot habits: user_information.getChildren()){
+                                if ("habits".equals(user_information.getKey())) {
+                                    for (DataSnapshot habits : user_information.getChildren()) {
                                         Habit habit;
                                         habit = habits.getValue(Habit.class);
                                         habit.setId(habits.getKey());
@@ -198,24 +206,38 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 }
+
                 @Override
                 public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
+                    mAdapter.clear();
+                    userHabitIDList.clear();
+                    for (DataSnapshot child : dataSnapshot.getChildren()) {
+                        if (mUserID.equals(child.getKey())) {
+                            for (DataSnapshot user_information : child.getChildren()) {
+                                if ("habits".equals(user_information.getKey())) {
+                                    for (DataSnapshot habits : user_information.getChildren()) {
+                                        Habit habit;
+                                        habit = habits.getValue(Habit.class);
+                                        habit.setId(habits.getKey());
+                                        userHabitIDList.add(habits.getKey());
+                                        mAdapter.add(habit);
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
 
                 @Override
                 public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-
                 }
 
                 @Override
                 public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
                 }
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
-
                 }
             };
             mDatabaseReference.addChildEventListener(mChildEventListener);
@@ -270,12 +292,12 @@ public class MainActivity extends AppCompatActivity {
             mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
         }
         detachDatabaseReadListener();
-        mAdapter.clear();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        mAdapter.clear();
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
         attachDatabaseReadListener();
     }
