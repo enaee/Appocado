@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Appocado</string>
     <string name="sign_out">Sign Out</string>
+    <string name="deleteHabit">Delete this habit</string>
 </resources>

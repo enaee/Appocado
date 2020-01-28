@@ -7,7 +7,6 @@ import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -15,30 +14,38 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
-public class HabitOverview extends AppCompatActivity
-        implements LocationListener,
-        GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener {
+public class HabitOverview extends AppCompatActivity implements LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+
+    public static final String HABIT_NAME = "habit name";
+    public static final String USER_ID = "userID";
+    public static final String HABIT_DESCRIPTION = "habit description";
+    public static final String HABIT_ID = "habitID";
 
     private static final String TAG = "LocationDemo";
     private static final int MY_PERMISSIONS_REQUEST = 99;
     private GoogleApiClient mGoogleApiClient;
     private Location mLocation;
-    private TextView mLocationText;
-    private TextView mHabitText;
+    private TextView mLocationText, mHabitText, mHabitDescription;
+    private TextView mDeleteHabit;
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,8 +64,29 @@ public class HabitOverview extends AppCompatActivity
                     addOnConnectionFailedListener(this).
                     addApi(LocationServices.API).build();
         }
-        mLocationText = (TextView) findViewById(R.id.textView);
-        mHabitText = (TextView) findViewById(R.id.Habit);
+
+        initializeUI();
+
+    }
+
+    private void initializeUI() {
+        mLocationText = findViewById(R.id.textView);
+        mHabitText = findViewById(R.id.Habit);
+        mDeleteHabit = findViewById(R.id.deleteHabit);
+        final String userID = getIntent().getStringExtra(USER_ID);
+        final String habitID = getIntent().getStringExtra(HABIT_ID);
+        String sessionId = getIntent().getStringExtra(HABIT_NAME);
+        mHabitText.setText(sessionId);
+
+        mDeleteHabit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //TODO Ask user if he realy wants to delete the habit
+                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("users/" + userID + "/habits");
+                databaseReference.child(habitID).setValue(null);
+                finish();
+            }
+        });
     }
 
     private void checkPermissions() {
@@ -134,7 +162,7 @@ public class HabitOverview extends AppCompatActivity
     @SuppressLint("MissingPermission")
     @Override
     public void onLocationChanged(Location location) {
-        Log.d(TAG,"Location changed");
+        Log.d(TAG, "Location changed");
         mLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         if (mLocation != null) {
             Geocoder geocoder = new Geocoder(this, Locale.getDefault());
@@ -146,8 +174,7 @@ public class HabitOverview extends AppCompatActivity
             }
             String cityName = addresses.get(0).getLocality();
             mLocationText.setText(cityName);
-            String sessionId = getIntent().getStringExtra("Habit");
-            mHabitText.setText(sessionId);
+
         }
     }
 
@@ -182,6 +209,7 @@ public class HabitOverview extends AppCompatActivity
     @Override
     public void onConnectionSuspended(int i) {
     }
+
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
