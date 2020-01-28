@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
@@ -45,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private String mUserID;
     private ArrayList userHabitIDList = new ArrayList<>();
     private CustomGridAdapter mAdapter;
+    private ProgressBar mProgressBar;
 
     // Firebase instance variables
     private FirebaseDatabase mFirebaseDatabase;
@@ -70,7 +72,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mUserID = ANONYMOUS;
-
+        mProgressBar = findViewById(R.id.progressBar);
+        mProgressBar.setVisibility(View.VISIBLE);
         //Initializse Firebase components
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mFirebaseStorage = FirebaseStorage.getInstance();
@@ -113,12 +116,18 @@ public class MainActivity extends AppCompatActivity {
         mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // Creates new intent, passes name of habit to habit overview screen
+                //add value to habit
+                Habit habit = mAdapter.getItem(position);
+                int count = habit.getCount() + 1;
+                //int count = Integer.parseInt(habit.getCount())+1;
+                mDatabaseReference.child("users/" + mUserID + "/habits/" + habit.getId() + "/count").setValue(count);
+
+                // Creates new intent, passes habit information to new activity
                 Intent intent = new Intent(MainActivity.this, HabitOverview.class);
-                intent.putExtra(HABIT_NAME, mAdapter.getItem(position).getName());
+                intent.putExtra(HABIT_NAME, habit.getName());
                 intent.putExtra(USER_ID, mUserID);
-                intent.putExtra(HABIT_ID, mAdapter.getItem(position).getId());
-                Toast.makeText(getApplicationContext(), mAdapter.getItem(position).getName(), Toast.LENGTH_SHORT).show();
+                intent.putExtra(HABIT_ID, habit.getId());
+                Toast.makeText(getApplicationContext(), habit.getName(), Toast.LENGTH_SHORT).show();
                 startActivityForResult(intent, 12);
             }
         });
@@ -187,6 +196,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void attachDatabaseReadListener() {
         if (mChildEventListener == null) {
+
             mChildEventListener = new ChildEventListener() {
                 @Override
                 public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
@@ -205,6 +215,7 @@ public class MainActivity extends AppCompatActivity {
                             }
                         }
                     }
+                    mProgressBar.setVisibility(View.INVISIBLE);
                 }
 
                 @Override
@@ -246,6 +257,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void onSignedOutCleanup() {
         mUserID = ANONYMOUS;
+
         //mMessageAdapter.clear();
         detachDatabaseReadListener();
     }
@@ -297,6 +309,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        userHabitIDList.clear();
         mAdapter.clear();
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
         attachDatabaseReadListener();

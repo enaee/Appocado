@@ -1,13 +1,15 @@
 package com.jku.appocado;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -57,6 +59,12 @@ public class HabitSelection extends AppCompatActivity {
 
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        onBackPressed();
+        return true;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_habit_selection);
@@ -64,20 +72,21 @@ public class HabitSelection extends AppCompatActivity {
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) userHabitsID = bundle.getStringArrayList(USER_HABITS);
 
+        //Initializse Firebase components
         mFirebaseAuth = FirebaseAuth.getInstance();
         mDatabaseReference = FirebaseDatabase.getInstance().getReference();
-
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
         if (mFirebaseUser != null) {
             mUserID = mFirebaseUser.getUid();
         }
-
-        //Initializse Firebase components
         mFirebaseDatabase = FirebaseDatabase.getInstance();
-
         mDatabaseReference = mFirebaseDatabase.getReference();
-
         attachDatabaseReadListener();
+
+        //back button
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+
         initializeUI();
     }
 
@@ -92,6 +101,7 @@ public class HabitSelection extends AppCompatActivity {
 
 
         mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @SuppressLint("NewApi")
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // Creates new intent, passes name of habit to habit overview screen
@@ -101,12 +111,12 @@ public class HabitSelection extends AppCompatActivity {
                 if (checkIfUserHasHabit(mAdapter.getItem(position).getId())) {
                     Toast.makeText(getApplicationContext(), "Already selected", Toast.LENGTH_SHORT).show();
                 } else {
-                    view.setBackgroundColor(Color.YELLOW);
+                    view.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.rectangle_filled));
                     Toast.makeText(getApplicationContext(), mAdapter.getItem(position).getName(), Toast.LENGTH_SHORT).show();
 
                     final FirebaseDatabase database = FirebaseDatabase.getInstance();
 
-                    mSelectedHabits.put(String.valueOf(id), new Habit(mAdapter.getItem(position).getName(), mAdapter.getItem(position).getDescription(), mAdapter.getItem(position).getImage()));
+                    mSelectedHabits.put(String.valueOf(id), new Habit(mAdapter.getItem(position).getName(), mAdapter.getItem(position).getDescription(), mAdapter.getItem(position).getImage(), 0));
 
                 }
             }
@@ -225,7 +235,7 @@ public class HabitSelection extends AppCompatActivity {
             textView.setText(getItem(position).getName());
             Glide.with(imageView.getContext()).load(getItem(position).getImage()).into(imageView);
             if (checkIfUserHasHabit(getItem(position).getId())) {
-                mView.setBackgroundColor(Color.YELLOW);
+                mView.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.rectangle_filled));
             }
             return mView;
         }
