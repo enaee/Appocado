@@ -124,10 +124,13 @@ public class MainActivity extends AppCompatActivity {
 
                 // Creates new intent, passes habit information to new activity
                 Intent intent = new Intent(MainActivity.this, HabitOverview.class);
+
                 intent.putExtra(HABIT_NAME, habit.getName());
                 intent.putExtra(USER_ID, mUserID);
                 intent.putExtra(HABIT_ID, habit.getId());
                 Toast.makeText(getApplicationContext(), habit.getName(), Toast.LENGTH_SHORT).show();
+
+
                 startActivityForResult(intent, 12);
             }
         });
@@ -309,7 +312,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
         userHabitIDList.clear();
+
         mAdapter.clear();
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
         attachDatabaseReadListener();
