@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -13,7 +12,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
@@ -24,11 +22,9 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.jku.appocado.Adapters.CustomGridAdapter;
-import com.jku.appocado.Models.GridItem;
 import com.jku.appocado.Models.Habit;
 
 import java.util.ArrayList;
@@ -38,11 +34,11 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String ANONYMOUS = "anonymous";
     private static final String TAG = "MainActivity";
+    private static final String USER_HABITS = "User Habit List";
     private static final int RC_SIGN_IN = 123; //RC = request code
-    private static final int RC_PHOTO_PICKER = 12;
     private String mUserID;
-    private ArrayList usersHabitList = new ArrayList<>();
-    private ArrayList allHabitsList = new ArrayList();
+    public static ArrayList usersHabitList = new ArrayList<>();
+    private ArrayList userHabitIDList = new ArrayList<>();
     private CustomGridAdapter mAdapter;
 
     // Firebase instance variables
@@ -54,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseUser mFirebaseUser;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
     private FirebaseStorage mFirebaseStorage;
-    private StorageReference mChatPhotosStorageReference;
+    private StorageReference mStorageReference;
     private ChildEventListener mChildEventListener;
     private ChildEventListener mHabitsEventListener;
     private ChildEventListener mUsersEventListener;
@@ -105,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
 //        mTextView = findViewById(R.id.tvTest);
 
         //Grid view for selected habits
-        mGridView = (GridView) findViewById(R.id.grid_view);
+        mGridView = findViewById(R.id.grid_view);
         mAdapter = new CustomGridAdapter(this, R.layout.grid_view_item, usersHabitList);
         mGridView.setAdapter(mAdapter);
 
@@ -114,8 +110,8 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // Creates new intent, passes name of habit to habit overview screen
                 Intent intent = new Intent(MainActivity.this, HabitOverview.class);
-                intent.putExtra("Habit", mAdapter.getItem(position).getHabitName());
-                Toast.makeText(getApplicationContext(), mAdapter.getItem(position).getHabitName(), Toast.LENGTH_SHORT).show();
+                intent.putExtra("Habit", mAdapter.getItem(position).getName());
+                Toast.makeText(getApplicationContext(), mAdapter.getItem(position).getName(), Toast.LENGTH_SHORT).show();
                 startActivityForResult(intent, 12);
             }
         });
@@ -127,6 +123,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 // Creates new intent, passes name of habit to habit overview screen
                 Intent intent = new Intent(MainActivity.this, HabitSelection.class);
+                intent.putStringArrayListExtra(USER_HABITS, userHabitIDList);
                 startActivity(intent);
             }
         });
@@ -177,7 +174,6 @@ public class MainActivity extends AppCompatActivity {
     private void onSignedInInitialize() {
         mUserID = mFirebaseUser.getUid();
         mFirebaseDatabase.getReference().child("users").child(mUserID).child("name").setValue(mFirebaseUser.getDisplayName());
-        ;
         attachDatabaseReadListener();
     }
 
@@ -193,9 +189,9 @@ public class MainActivity extends AppCompatActivity {
                                     for (DataSnapshot habits: user_information.getChildren()){
                                         Habit habit;
                                         habit = habits.getValue(Habit.class);
-                                        habit.setId(dataSnapshot.getKey());
-                                        allHabitsList.add(habit);
-                                        mAdapter.add(new GridItem(habit.getName(), 0, habit.getDescription()));
+                                        habit.setId(habits.getKey());
+                                        userHabitIDList.add(habits.getKey());
+                                        mAdapter.add(habit);
                                     }
                                 }
                             }
@@ -281,8 +277,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+        attachDatabaseReadListener();
     }
 
+    //Why is this here?
+    /*
     @Override
     protected void onRestart() {
         super.onRestart();
@@ -297,7 +296,7 @@ public class MainActivity extends AppCompatActivity {
                                     Habit habit = new Habit(habits.getValue().toString(), habits.getKey());
                                     habit.setId(dataSnapshot.getKey());
                                     allHabitsList.add(habit);
-                                    mAdapter.add(new GridItem(habit.getName(), 0, habit.getDescription()));
+                                    mAdapter.add(habit);
                                 }
                             }
                         }
@@ -306,5 +305,5 @@ public class MainActivity extends AppCompatActivity {
                     public void onCancelled(DatabaseError databaseError) {
                     }
                 });
-    }
+    } */
 }

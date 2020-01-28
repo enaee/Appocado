@@ -1,12 +1,11 @@
 package com.jku.appocado.Models;
 
-import java.util.ArrayList;
-
 public class Habit {
     String id;
     String name;
     String description;
-    ArrayList users;
+    String image;
+    String count;
 
     public Habit() {
     }
@@ -19,14 +18,24 @@ public class Habit {
         this.id = id;
     }
 
+    public Habit(String name, String description, String image) {
+        this.name = name;
+        this.description = description;
+        this.image = image;
+    }
+
     public Habit(String name, String description) {
         this.name = name;
         this.description = description;
     }
-    public Habit(String id, String name, String description) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
+
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public String getName() {
@@ -44,4 +53,6 @@ public class Habit {
     public void setDescription(String description) {
         this.description = description;
     }
+
+
 }

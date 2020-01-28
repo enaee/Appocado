@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -14,20 +13,15 @@
 <!--        android:text="Appocado!" />-->
 
     <GridView
-        xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/grid_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="10dp"
-        android:verticalSpacing="16dp"
-
-        android:horizontalSpacing="10dp"
-        android:numColumns="2"
-        android:columnWidth="60dp"
-        android:stretchMode="columnWidth"
-
+        android:layout_marginTop="16dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:gravity="center"
-        />
+        android:horizontalSpacing="16dp"
+        android:minHeight="96dp"
+        android:numColumns="2"
+        android:verticalSpacing="16dp" />
 
 
     <android.support.design.widget.FloatingActionButton
@@ -41,6 +35,7 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         android:padding="16dp"
+        android:src="@drawable/ic_add_white_24dp"
         android:visibility="visible" />
 
 </RelativeLayout>

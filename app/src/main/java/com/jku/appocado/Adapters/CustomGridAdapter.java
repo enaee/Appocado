@@ -8,14 +8,14 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.jku.appocado.Models.GridItem;
+import com.bumptech.glide.Glide;
+import com.jku.appocado.Models.Habit;
 import com.jku.appocado.R;
 
 import java.util.ArrayList;
 
-public class CustomGridAdapter extends ArrayAdapter <GridItem> {
+public class CustomGridAdapter extends ArrayAdapter<Habit> {
 
-    private TextView habitName;
 
     public CustomGridAdapter(Context context, int textViewResourceId, ArrayList objects) {
         super(context, textViewResourceId, objects);
@@ -31,14 +31,14 @@ public class CustomGridAdapter extends ArrayAdapter <GridItem> {
 
         LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         view = inflater.inflate(R.layout.grid_view_item, null);
-        TextView textView = (TextView) view.findViewById(R.id.gridText);
-        ImageView imageView = (ImageView) view.findViewById(R.id.gridImage);
-        textView.setText(getItem(position).getHabitName());
+        TextView textView = view.findViewById(R.id.gridText);
+        ImageView imageView = view.findViewById(R.id.gridImage);
+        textView.setText(getItem(position).getName());
+        Glide.with(imageView.getContext()).load(getItem(position).getImage()).into(imageView);
 
         return view;
 
     }
-
 
 
 }
