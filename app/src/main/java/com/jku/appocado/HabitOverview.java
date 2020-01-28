@@ -16,7 +16,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -82,8 +81,8 @@ public class HabitOverview extends AppCompatActivity implements LocationListener
         mDeleteHabit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //TODO Ask user if he realy wants to delete the habit
                 DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("users/" + userID + "/habits");
-                Toast.makeText(getApplicationContext(), "delete", Toast.LENGTH_SHORT).show();
                 databaseReference.child(habitID).setValue(null);
                 finish();
             }
