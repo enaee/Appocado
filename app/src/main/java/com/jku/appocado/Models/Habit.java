@@ -5,7 +5,15 @@ public class Habit {
     String name;
     String description;
     String image;
-    String count;
+    int count;
+
+    public Habit(String name, String description, String image, int count) {
+
+        this.name = name;
+        this.description = description;
+        this.image = image;
+        this.count = count;
+    }
 
     public Habit() {
     }
@@ -24,11 +32,13 @@ public class Habit {
         this.image = image;
     }
 
-    public Habit(String name, String description) {
-        this.name = name;
-        this.description = description;
+    public int getCount() {
+        return count;
     }
 
+    public void setCount(int count) {
+        this.count = count;
+    }
 
     public String getImage() {
         return image;

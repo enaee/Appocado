@@ -12,6 +12,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
@@ -26,9 +28,12 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.jku.appocado.Adapters.CustomGridAdapter;
 import com.jku.appocado.Models.Habit;
+import com.jku.appocado.Models.Score;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -45,6 +50,8 @@ public class MainActivity extends AppCompatActivity {
     private String mUserID;
     private ArrayList userHabitIDList = new ArrayList<>();
     private CustomGridAdapter mAdapter;
+    private ProgressBar mProgressBar;
+    private Score mScore;
 
     // Firebase instance variables
     private FirebaseDatabase mFirebaseDatabase;
@@ -63,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
     //UI
 //    private TextView mTextView;
     private GridView mGridView;
+    private TextView mTotalActions, mDaysTotal, mStrikeDays;
 
 
     @Override
@@ -70,7 +78,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mUserID = ANONYMOUS;
-
+        mProgressBar = findViewById(R.id.progressBar);
+        mProgressBar.setVisibility(View.VISIBLE);
         //Initializse Firebase components
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mFirebaseStorage = FirebaseStorage.getInstance();
@@ -103,25 +112,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initializeUI() {
-//        mTextView = findViewById(R.id.tvTest);
+        mTotalActions = findViewById(R.id.totalActionsMade);
+        mDaysTotal = findViewById(R.id.totalDays);
+        mStrikeDays = findViewById(R.id.strikeDays);
 
         //Grid view for selected habits
         mGridView = findViewById(R.id.grid_view);
         mAdapter = new CustomGridAdapter(this, R.layout.grid_view_item, usersHabitList);
         mGridView.setAdapter(mAdapter);
 
-        mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // Creates new intent, passes name of habit to habit overview screen
-                Intent intent = new Intent(MainActivity.this, HabitOverview.class);
-                intent.putExtra(HABIT_NAME, mAdapter.getItem(position).getName());
-                intent.putExtra(USER_ID, mUserID);
-                intent.putExtra(HABIT_ID, mAdapter.getItem(position).getId());
-                Toast.makeText(getApplicationContext(), mAdapter.getItem(position).getName(), Toast.LENGTH_SHORT).show();
-                startActivityForResult(intent, 12);
-            }
-        });
+        setGridClickListener();
 
 
         // Floating Action button to go to select new habits
@@ -135,6 +135,49 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    private void setGridClickListener() {
+        mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //add value to habit
+
+                setScoreData();
+
+
+                Habit habit = mAdapter.getItem(position);
+                int count = habit.getCount() + 1;
+                mScore.setTotalActions(mScore.getTotalActions() + 1);
+
+                //int count = Integer.parseInt(habit.getCount())+1;
+                mDatabaseReference.child("users/" + mUserID + "/habits/" + habit.getId() + "/count").setValue(count);
+
+                // Creates new intent, passes habit information to new activity
+                Intent intent = new Intent(MainActivity.this, HabitOverview.class);
+                intent.putExtra(HABIT_NAME, habit.getName());
+                intent.putExtra(USER_ID, mUserID);
+                intent.putExtra(HABIT_ID, habit.getId());
+                Toast.makeText(getApplicationContext(), habit.getName(), Toast.LENGTH_SHORT).show();
+                startActivityForResult(intent, 12);
+            }
+        });
+    }
+
+    private void setScoreData() {
+        SimpleDateFormat simpledateformat = new SimpleDateFormat("yyMMdd");
+        String date = simpledateformat.format(Calendar.getInstance().getTime());
+        mDatabaseReference.child("users/" + mUserID + "/score/lastInput").setValue(date);
+        mDatabaseReference.child("users/" + mUserID + "/score/totalActions").setValue(mScore.getTotalActions() + 1);
+        if (!date.equals(mScore.getLastInput())) {
+            mDatabaseReference.child("users/" + mUserID + "/score/totalDays").setValue(mScore.getTotalDays() + 1);
+            int lastDate = Integer.parseInt(mScore.getLastInput());
+            int newDate = Integer.parseInt(date);
+            if (lastDate == (newDate - 1)) {
+                mDatabaseReference.child("users/" + mUserID + "/score/strike").setValue(mScore.getStrike() + 1);
+            }
+        }
+
     }
 
     private void initializeFirebaseAuth() {
@@ -187,6 +230,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void attachDatabaseReadListener() {
         if (mChildEventListener == null) {
+
             mChildEventListener = new ChildEventListener() {
                 @Override
                 public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
@@ -202,9 +246,16 @@ public class MainActivity extends AppCompatActivity {
                                         mAdapter.add(habit);
                                     }
                                 }
+                                if ("score".equals(user_information.getKey())) {
+                                    Score score;
+                                    score = user_information.getValue(Score.class);
+                                    mScore = score;
+                                    updateScore();
+                                }
                             }
                         }
                     }
+                    mProgressBar.setVisibility(View.INVISIBLE);
                 }
 
                 @Override
@@ -244,8 +295,15 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void updateScore() {
+        mTotalActions.setText(Integer.toString(mScore.getTotalActions()));
+        mDaysTotal.setText(Integer.toString(mScore.getTotalDays()));
+        mStrikeDays.setText(Integer.toString(mScore.getStrike()));
+    }
+
     private void onSignedOutCleanup() {
         mUserID = ANONYMOUS;
+
         //mMessageAdapter.clear();
         detachDatabaseReadListener();
     }
@@ -297,6 +355,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        mProgressBar.setVisibility(View.VISIBLE);
+        userHabitIDList.clear();
         mAdapter.clear();
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
         attachDatabaseReadListener();

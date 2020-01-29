@@ -6,23 +6,84 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-<!--    <TextView-->
-<!--        android:id="@+id/tvTest"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:text="Appocado!" />-->
+    <RelativeLayout
+        android:id="@+id/score"
+        android:layout_width="240dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="16dp">
+
+        <TextView
+            android:id="@+id/totalActionsMade"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:text="10" />
+
+        <TextView
+            android:id="@+id/totalActionsMadeText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/totalActionsMade"
+            android:layout_centerHorizontal="true"
+            android:text="@string/total_actions_made" />
+
+        <TextView
+            android:id="@+id/totalDays"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/totalActionsMadeText"
+            android:layout_alignParentStart="true"
+            android:text="10" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/totalDays"
+            android:layout_alignParentStart="true"
+            android:text="@string/days_total" />
+
+        <TextView
+            android:id="@+id/strikeDays"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/totalActionsMadeText"
+            android:layout_alignParentEnd="true"
+            android:text="10" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/strikeDays"
+            android:layout_alignParentEnd="true"
+            android:text="@string/strike_days" />
+
+
+    </RelativeLayout>
+
 
     <GridView
         android:id="@+id/grid_view"
-        android:layout_marginTop="16dp"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
+        android:layout_below="@+id/score"
+        android:layout_marginLeft="32dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginRight="32dp"
         android:horizontalSpacing="16dp"
-        android:minHeight="96dp"
         android:numColumns="2"
         android:verticalSpacing="16dp" />
 
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="@style/Widget.AppCompat.ProgressBar"
+        android:layout_width="188dp"
+        android:layout_height="194dp"
+        android:layout_centerInParent="true"
+        android:indeterminate="true"
+        android:visibility="visible" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
