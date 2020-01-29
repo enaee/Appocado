@@ -158,6 +158,7 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra(HABIT_NAME, habit.getName());
                 intent.putExtra(USER_ID, mUserID);
                 intent.putExtra(HABIT_ID, habit.getId());
+                intent.putExtra(HABIT_DESCRIPTION, habit.getDescription());
                 Toast.makeText(getApplicationContext(), habit.getName(), Toast.LENGTH_SHORT).show();
                 startActivityForResult(intent, 12);
             }
@@ -361,31 +362,4 @@ public class MainActivity extends AppCompatActivity {
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
         attachDatabaseReadListener();
     }
-
-    //Why is this here?
-    /*
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-
-        FirebaseDatabase.getInstance().getReference().child("users")
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        for (DataSnapshot habit_values : dataSnapshot.getChildren()) {
-                            if (dataSnapshot.getKey().equals(mUserID)) {
-                                for (DataSnapshot habits : habit_values.getChildren()) {
-                                    Habit habit = new Habit(habits.getValue().toString(), habits.getKey());
-                                    habit.setId(dataSnapshot.getKey());
-                                    allHabitsList.add(habit);
-                                    mAdapter.add(habit);
-                                }
-                            }
-                        }
-                    }
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                    }
-                });
-    } */
 }
