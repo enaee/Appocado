@@ -14,9 +14,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-
 import android.view.MenuItem;
-
 import android.view.View;
 import android.widget.TextView;
 
@@ -56,7 +54,6 @@ public class HabitOverview extends AppCompatActivity implements LocationListener
     }
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,7 +75,6 @@ public class HabitOverview extends AppCompatActivity implements LocationListener
         //back button
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         initializeUI();
-
 
 
     }
