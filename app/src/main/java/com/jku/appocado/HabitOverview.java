@@ -16,8 +16,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -37,13 +39,18 @@ public class HabitOverview extends AppCompatActivity implements LocationListener
     public static final String USER_ID = "userID";
     public static final String HABIT_DESCRIPTION = "habit description";
     public static final String HABIT_ID = "habitID";
+    public static final String HABIT_COUNT = "habit count";
+    public static final String HABIT_IMG = "habit image";
 
     private static final String TAG = "LocationDemo";
     private static final int MY_PERMISSIONS_REQUEST = 99;
     private GoogleApiClient mGoogleApiClient;
     private Location mLocation;
-    private TextView mLocationText, mHabitText, mHabitDescription;
+    private TextView mLocationText, mHabitText, mHabitDescription, mHabitCount;
     private TextView mDeleteHabit;
+    private ImageView mHabitImage;
+
+    private String cityName;
 
 
     //back button logic
@@ -74,24 +81,46 @@ public class HabitOverview extends AppCompatActivity implements LocationListener
 
         //back button
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("");
+        getSupportActionBar().setElevation(0);
+        getSupportActionBar().setBackgroundDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.rectangle_yellow));
         initializeUI();
 
 
     }
 
     private void initializeUI() {
-        mLocationText = findViewById(R.id.textView);
+        mLocationText = findViewById(R.id.locationData);
         mHabitText = findViewById(R.id.Habit);
+        mHabitDescription = findViewById(R.id.habitDescription);
+        mHabitCount = findViewById(R.id.habitCount);
         mDeleteHabit = findViewById(R.id.deleteHabit);
+        mHabitImage = findViewById(R.id.habitImage);
+
+
+
+
         final String userID = getIntent().getStringExtra(USER_ID);
         final String habitID = getIntent().getStringExtra(HABIT_ID);
         String sessionId = getIntent().getStringExtra(HABIT_NAME);
+        String description = getIntent().getStringExtra(HABIT_DESCRIPTION);
+        int count = getIntent().getIntExtra(HABIT_COUNT, 0);
+        count = count + 1;
         mHabitText.setText(sessionId);
+        mHabitDescription.setText(description);
+        if (count == 1) {
+            mHabitCount.setText(R.string.firstActivity);
+        } else {
+            mHabitCount.setText("Wow, you did this " + count + " times!");
+        }
+
+        String img = getIntent().getStringExtra(HABIT_IMG);
+        Glide.with(getApplicationContext()).load(img).into(mHabitImage);
+
 
         mDeleteHabit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO Ask user if he realy wants to delete the habit
                 DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("users/" + userID + "/habits");
                 databaseReference.child(habitID).setValue(null);
                 finish();
@@ -182,9 +211,9 @@ public class HabitOverview extends AppCompatActivity implements LocationListener
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            String cityName = addresses.get(0).getLocality();
-            mLocationText.setText(cityName);
+            cityName = addresses.get(0).getLocality();
 
+            mLocationText.setText("You are doing better than 59% people in " + cityName + "!");
         }
     }
 

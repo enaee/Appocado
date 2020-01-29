@@ -85,6 +85,9 @@ public class HabitSelection extends AppCompatActivity {
 
         //back button
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("");
+        getSupportActionBar().setElevation(0);
+        //getSupportActionBar().setBackgroundDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.rectangle_yellow));
 
 
         initializeUI();

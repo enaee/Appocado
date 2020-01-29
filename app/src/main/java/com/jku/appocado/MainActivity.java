@@ -42,7 +42,8 @@ public class MainActivity extends AppCompatActivity {
     public static final String USER_ID = "userID";
     public static final String HABIT_DESCRIPTION = "habit description";
     public static final String HABIT_ID = "habitID";
-
+    public static final String HABIT_COUNT = "habit count";
+    public static final String HABIT_IMG = "habit image";
     private static final String TAG = "MainActivity";
     private static final String USER_HABITS = "User Habit List";
     private static final int RC_SIGN_IN = 123;
@@ -159,7 +160,8 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra(USER_ID, mUserID);
                 intent.putExtra(HABIT_ID, habit.getId());
                 intent.putExtra(HABIT_DESCRIPTION, habit.getDescription());
-                Toast.makeText(getApplicationContext(), habit.getName(), Toast.LENGTH_SHORT).show();
+                intent.putExtra(HABIT_COUNT, habit.getCount());
+                intent.putExtra(HABIT_IMG, habit.getImage());
                 startActivityForResult(intent, 12);
             }
         });
