@@ -3,25 +3,56 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    style="@style/Theme.AppCompat.Light.NoActionBar"
+    android:background="@color/colorAccent"
     tools:context=".HabitOverview">
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@id/Habit"
+
+    <ImageView
+        android:id="@+id/habitImage"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="48dp"
         android:layout_centerHorizontal="true"
-        android:gravity="center"
-        android:textSize="32dp" />
+        android:layout_width="match_parent"
+        android:layout_height="120dp" />
 
     <TextView
         android:id="@+id/Habit"
-        android:layout_width="363dp"
+        android:layout_below="@+id/habitImage"
+        android:layout_marginTop="64dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_centerHorizontal="true"
         android:layout_height="wrap_content"
+        android:layout_width="match_parent"
         android:gravity="center"
-        android:layout_centerInParent="true"
-        android:textSize="32dp" />
-
+        android:textAllCaps="true"
+        android:textSize="24sp"
+        android:textColor="#FFFFFF" />
+    <TextView
+        android:id="@+id/locationData"
+        android:layout_marginTop="16dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/habitCount"
+        android:textColor="#FFFFFF"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:textSize="18sp" />
+    <TextView
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:id="@+id/habitDescription"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/Habit"
+        android:textColor="#FFFFFF"
+        android:layout_centerHorizontal="true"
+        android:textSize="18sp"
+        android:gravity="center" />
 
     <TextView
         android:id="@+id/deleteHabit"
@@ -31,5 +62,15 @@
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="16dp"
         android:padding="8dp"
+        android:textColor="@color/colorPrimaryDark"
         android:text="@string/deleteHabit" />
+
+    <TextView
+        android:id="@+id/habitCount"
+        android:layout_below="@+id/habitDescription"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:textColor="@color/colorAccent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 </RelativeLayout>
