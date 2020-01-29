@@ -2,4 +2,7 @@
     <string name="app_name">Appocado</string>
     <string name="sign_out">Sign Out</string>
     <string name="deleteHabit">Delete this habit</string>
+    <string name="total_actions_made">Total actions</string>
+    <string name="days_total">Total Days</string>
+    <string name="strike_days">Day Strike</string>
 </resources>
